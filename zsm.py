@@ -32,11 +32,11 @@ class ZipSeekingMissile:
 		self.LocalFileHeaders = [m.start() for m in self.patternLocalFileHeader.finditer(self.mm)]
 		if len(self.LocalFileHeaders) < 1:
 			print("No local headers found.")
-		else: 
+		else:
 			for i in reversed(self.LocalFileHeaders):
 				self.localfilenamelen = int(struct.unpack('<H',self.mm[i+0x1a:i+0x1c])[0])
 				self.localextrafieldlen = int(struct.unpack('<H',self.mm[i+0x1c:i+0x1e])[0])
-				print("File name: %s" % str(self.mm[i+0x1e:i+0x1e+self.localfilenamelen]))
+				print("Offset %d - LH INFO - File name: %s" % (i,str(self.mm[i+0x1e:i+0x1e+self.localfilenamelen])))
 				print("\tVersion: %d" % int(struct.unpack('<H',self.mm[i+0x04:i+0x06])[0]))
 				#Parse Flags
 				print("\tCompression: %s" % self.compression_type(int(struct.unpack('<H',self.mm[i+0x08:i+0x0a])[0])))
@@ -73,7 +73,7 @@ class ZipSeekingMissile:
 					print("Compressed size is in the extra field, implement it next" )
 				else:
 					self.filenamelen = int(struct.unpack('<H',self.mm[i+0x1c:i+0x1e])[0])
-					print("File name: %s" % str(self.mm[i+0x2e:i+0x2e+self.filenamelen]))
+					print("Offset %d - CD INFO - File name: %s" % (i,str(self.mm[i+0x2e:i+0x2e+self.filenamelen])))
 					print("\tVersion: %d" % int(struct.unpack('<H',self.mm[i+0x04:i+0x06])[0]))
 					print("\tVersion Needed To Extract: %d" % struct.unpack('<H',self.mm[i+0x06:i+0x08]))
 					#parse flags
