@@ -1,15 +1,6 @@
 #!/usr/bin/python
 #Zip seeking missile
-# Reads file for Central Directory Header 50 4B 05 06
-# Record the disk offset of the Central Directory
-# Seek 16 bytes and read 4 (Offset of cd wrt to starting disk)
-# Seek to disk offset of (Start of the Central Directory Header - offset of the disk) which should be the start of the zip file if it is all in one piece.
-#Read 4 bytes and check for a Local File Header 50 4B 03 04
-#If it is there then we can *assume* that this is a complete zip file. Save it to disk.
-
-# def parse_local_file_header(raw_record, options):
-# def parse_central_dir_file_header(raw_record, options):
-# def parse_end_of_central_dir_record(raw_record, options):
+#by Jonathan Glass and Adam Polkosnik
 import sys, mmap, binascii, re, struct
 from optparse import OptionParser
 from datetime import datetime, date, time
@@ -48,7 +39,7 @@ class ZipSeekingMissile:
 				print("File name: %s" % str(self.mm[i+0x1e:i+0x1e+self.localfilenamelen]))
 				print("\tVersion: %d" % int(struct.unpack('<H',self.mm[i+0x04:i+0x06])[0]))
 				#Parse Flags
-				print("\tCompression: %d" % int(struct.unpack('<H',self.mm[i+0x08:i+0x0a])[0]))
+				print("\tCompression: %s" % self.compression_type(int(struct.unpack('<H',self.mm[i+0x08:i+0x0a])[0])))
 				self.localheaderlastmodtime = int(struct.unpack('<H',self.mm[i+0x0a:i+0x0c])[0])
 				self.localheaderlastmoddate = int(struct.unpack('<H',self.mm[i+0x0c:i+0x0e])[0])
 				print("\tLast Modified Date %s" % self.dos_date_time_to_datetime(self.localheaderlastmoddate,self.localheaderlastmodtime))
@@ -85,7 +76,7 @@ class ZipSeekingMissile:
 					print("File name: %s" % str(self.mm[i+0x2e:i+0x2e+self.filenamelen]))
 					print("\tVersion: %d" % int(struct.unpack('<H',self.mm[i+0x04:i+0x06])[0]))
 					print("\tVersion Needed To Extract: %d" % struct.unpack('<H',self.mm[i+0x06:i+0x08]))
-					print("\tCompression Type: %d" % struct.unpack('<H',self.mm[i+0x0a:i+0x0c]))
+					print("\tCompression: %s" % self.compression_type(struct.unpack('<H',self.mm[i+0x0a:i+0x0c])[0]))
 					self.lastmodtime = int(struct.unpack('<H',self.mm[i+0x0c:i+0x0e])[0])
 					self.lastmoddate = int(struct.unpack('<H',self.mm[i+0x0e:i+0x10])[0])
 					print("\tLast Modified Date %s" % self.dos_date_time_to_datetime(self.lastmoddate,self.lastmodtime))
@@ -107,6 +98,18 @@ class ZipSeekingMissile:
 		month = (dos_date & 0x1E0) >> 5
 		year = ((dos_date & 0xFE00) >> 9) + 1980
 		return datetime(year, month, day, hours, mins, secs)
+	
+	def compression_type(self,n):
+		reserved = [7,11,13,15,16,17]
+		if n in reserved:
+			return "Reserved? Weird. Type code is %d" % n
+		else:
+			DictCompressionTypes ={0:"00: No Compression",1:"01: Shrunk",2:"02: reduced with compression factor 1",3:"03: reduced with compression factor 2",4:"04: reduced with compression factor 3",5:"05: reduced with compression factor 4",6:"06: imploded",8:"08: Deflated",9:"09: Enhanced Deflated",10:"10: PKWare DCL imploded",12:"12: Compressed using BZIP2",14:"14: LZMA",18:"18: compressed using IBM TERSE",19:"19: IBM LZ77 z",98:"98: PPMd version I, Rev 1"}
+			if n in DictCompressionTypes:
+				return DictCompressionTypes[int(n)]
+			else:
+				return "Undocumented Compression Type. Weird.  Type code is %d" % n
+		
                                                 
 ZipSeekingMissile()
  
