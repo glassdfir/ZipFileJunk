@@ -76,6 +76,7 @@ class ZipSeekingMissile:
 					print("File name: %s" % str(self.mm[i+0x2e:i+0x2e+self.filenamelen]))
 					print("\tVersion: %d" % int(struct.unpack('<H',self.mm[i+0x04:i+0x06])[0]))
 					print("\tVersion Needed To Extract: %d" % struct.unpack('<H',self.mm[i+0x06:i+0x08]))
+					#parse flags
 					print("\tCompression: %s" % self.compression_type(struct.unpack('<H',self.mm[i+0x0a:i+0x0c])[0]))
 					self.lastmodtime = int(struct.unpack('<H',self.mm[i+0x0c:i+0x0e])[0])
 					self.lastmoddate = int(struct.unpack('<H',self.mm[i+0x0e:i+0x10])[0])
