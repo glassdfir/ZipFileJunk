@@ -58,7 +58,7 @@ class ZipSeekingMissile:
 				print("\tFile Name Length: %d" % struct.unpack('<H',self.mm[i+0x18:i+0x1a]))
 				print("\tExtra Field Length: %d" % struct.unpack('<H',self.mm[i+0x1c:i+0x1e]))
 				if self.localextrafieldlen > 0:
-					print("\tExtra Field: %d" % struct.unpack('<H',self.mm[i+0x30:i+0x30+self.localextrafieldlen]))
+					print("\tExtra Field: %s" % binascii.hexlify(self.mm[i+0x30:i+0x30+self.localextrafieldlen]))
 		self.look_for_central_dir()
 				
 	def look_for_central_dir(self):
