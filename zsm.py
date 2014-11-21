@@ -4,6 +4,7 @@
 import sys, mmap, binascii, re, struct
 from optparse import OptionParser
 from datetime import datetime, date, time
+from decimal import *
  
 class ZipSeekingMissile:
 	def __init__(self):
@@ -37,7 +38,7 @@ class ZipSeekingMissile:
 				self.localfilenamelen = int(struct.unpack('<H',self.mm[i+0x1a:i+0x1c])[0])
 				self.localextrafieldlen = int(struct.unpack('<H',self.mm[i+0x1c:i+0x1e])[0])
 				print("Offset %d - LH INFO - File name: %s" % (i,str(self.mm[i+0x1e:i+0x1e+self.localfilenamelen])))
-				print("\tVersion: %d" % int(struct.unpack('<H',self.mm[i+0x04:i+0x06])[0]))
+				print("\tVersion: %.2f" % float(struct.unpack('<H',self.mm[i+0x04:i+0x06])[0]/float(10.0)))
 				#Parse Flags
 				print("\tCompression: %s" % self.compression_type(int(struct.unpack('<H',self.mm[i+0x08:i+0x0a])[0])))
 				self.localheaderlastmodtime = int(struct.unpack('<H',self.mm[i+0x0a:i+0x0c])[0])
@@ -74,8 +75,8 @@ class ZipSeekingMissile:
 				else:
 					self.filenamelen = int(struct.unpack('<H',self.mm[i+0x1c:i+0x1e])[0])
 					print("Offset %d - CD INFO - File name: %s" % (i,str(self.mm[i+0x2e:i+0x2e+self.filenamelen])))
-					print("\tVersion: %d" % int(struct.unpack('<H',self.mm[i+0x04:i+0x06])[0]))
-					print("\tVersion Needed To Extract: %d" % struct.unpack('<H',self.mm[i+0x06:i+0x08]))
+					print("\tVersion: %.2f" % float(struct.unpack('<H',self.mm[i+0x04:i+0x06])[0]/float(10.0)))
+					print("\tVersion Needed To Extract: %.2f" % float(struct.unpack('<H',self.mm[i+0x06:i+0x08])[0]/float(10.0)))
 					#parse flags
 					print("\tCompression: %s" % self.compression_type(struct.unpack('<H',self.mm[i+0x0a:i+0x0c])[0]))
 					self.lastmodtime = int(struct.unpack('<H',self.mm[i+0x0c:i+0x0e])[0])
