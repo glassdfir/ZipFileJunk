@@ -32,6 +32,7 @@ class ZipSeekingMissile:
 		self.mm = mmap.mmap(self.filename.fileno(),0)
 		self.patternLocalFileHeader = re.compile(b'\x50\x4B\x03\x04')
 		self.LocalFileHeaders = [m.start() for m in self.patternLocalFileHeader.finditer(self.mm)]
+		print ("Possible %d Local File Headers at offsets: %s" % (len(self.LocalFileHeaders), self.LocalFileHeaders))
 		if len(self.LocalFileHeaders) < 1:
 			print("No local headers found.")
 		else:
@@ -61,7 +62,7 @@ class ZipSeekingMissile:
 		self.patternCentralDirEndRecord = re.compile(b'\x50\x4B\x05\x06')
 		self.CentralDirEndRecord = [m.start() for m in self.patternCentralDirEndRecord.finditer(self.mm)]
 		print ("Possible %d Central Directory File Headers at offsets: %s" % (len(self.CentralDirFileHeaders), self.CentralDirFileHeaders))
-		if len(self.CentralDirFileHeaders) < 0:
+		if len(self.CentralDirFileHeaders) == 0:
 			print("Found No Central Directory File Headers")
 		else: 
 			for i in self.CentralDirFileHeaders:
@@ -90,7 +91,7 @@ class ZipSeekingMissile:
 						print("\tFile Comment Length: %d" % struct.unpack('<H',self.mm[i+0x20:i+0x22]))
 						print("\tDisk # Start: %d" % struct.unpack('<H',self.mm[i+0x22:i+0x24]))
 		if len(self.CentralDirEndRecord) > 0:
-			print("Found %d hits for Central Dir. End Record at byte offsets %s ." % (len(self.CentralDirEndRecord), str(list(self.CentralDirEndRecord))))
+			print("Found %d possible hits for Central Dir. End Record at byte offsets %s ." % (len(self.CentralDirEndRecord), str(list(self.CentralDirEndRecord))))
 			#Parse CD End Record
 
 		#print("Central Dir contents: %s" % binascii.hexlify(self.mm[i:i+0x5f]))
