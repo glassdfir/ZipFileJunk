@@ -14,7 +14,7 @@ class ZipSeekingMissile:
 	def options(self):
 		parser = OptionParser()
 		parser.add_option("-f", "--file", dest="filename",help="File to carve Zips from", metavar="FILE")
-		parser.add_option("-v", "--verbose", dest="verbose", action="store_true",help="File to carve Zips from")
+		parser.add_option("-v", "--verbose", dest="verbose", action="store_true",help="Show more than file names")
 		(self.options, args) = parser.parse_args()
 
 	def openfile(self):
